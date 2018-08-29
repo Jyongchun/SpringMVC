@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/mvc
+       http://www.springframework.org/schema/mvc/spring-mvc.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <!--开启基于注解的配置-->
+    <context:component-scan base-package="com.neuedu"/>
+    <bean id="jspViewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="viewClass" value="org.springframework.web.servlet.view.JstlView"/>
+       <!--前缀-->
+        <property name="prefix" value="/WEB-INF/jsp/"/>
+       <!--后缀-->
+        <property name="suffix" value=".jsp"/>
+    </bean>
+
+    <!--支持Json的Bean,配置ViewResolver。 可以用多个ViewResolver。 使用order属性排序。
+InternalResourceViewResolver放在最后。 -->
+    <bean class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">
+        <property name="order" value="1" />
+        <property name="defaultViews">
+            <list>
+                <!-- JSON View -->
+                <bean class="org.springframework.web.servlet.view.json.MappingJackson2JsonView"></bean>
+            </list>
+        </property>
+    </bean>
+    <!--springmvc加载静态资源
+    mapping:不拦截某些资源
+    location:加载静态资源的位置
+    -->
+    <mvc:resources mapping="/static/**/" location="/WEB-INF/static/"></mvc:resources>
+
+    <!-- 文件上传 -->
+    <bean id="multipartResolver"
+          class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <!-- 设置上传文件的最大尺寸为5MB -->
+        <property name="maxUploadSize">
+            <value>5242880</value>
+        </property>
+    </bean>
+
+    <!-- 在SpringMVC配置文件中配置自定义转换器 -->
+    <mvc:annotation-driven conversion-service="conversionService"></mvc:annotation-driven>
+    <bean id="conversionService" class="org.springframework.format.support.FormattingConversionServiceFactoryBean">
+        <property name="converters">
+            <!-- 自定义转换器的类名 -->
+            <bean class="com.neuedu.utils.DateConverter"></bean>
+        </property>
+    </bean>
+
+</beans>
